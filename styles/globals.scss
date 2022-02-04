@@ -1,0 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap");
+
+@import "./tailwind.scss";
+@import "./loadingSpinner.scss";
+@import "./colors.scss";
+@import "./mixins.scss";
+@import "./screens.scss";
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	font-size: 1rem;
+	font-family: "Montserrat", sans-serif;
+}

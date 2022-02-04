@@ -1,0 +1,10 @@
+@import "./screens.scss";
+
+.formModal {
+	width: 40%;
+	border-radius: 0.5rem;
+
+	@include screen("medium") {
+		width: 90%;
+	}
+}
