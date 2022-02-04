@@ -10,34 +10,21 @@ interface UserProps {
 	name: string;
 	username: string;
 	city: string;
-	// phone: string;
-	// website: string;
-	// address: {
-	// 	city: string;
-	// 	street: string;
-	// 	suite: string;
-	// 	zipcode: string;
-	// 	geo: {
-	// 		lat: string;
-	// 		lng: string;
-	// 	};
-	// };
-	// company: {
-	// 	bs: string;
-	// 	name: string;
-	// 	catchPhrase: string;
-	// };
 }
+
+type modalType = "Add New User" | "Edit User";
 
 interface UserReducerType {
 	loading: boolean;
 	users: UserProps[];
 	error: null;
+	user: object;
+	modalType: modalType;
 }
 
 interface FormModalProps {
 	closeModal: () => void;
-	// onFormSubmit: (data: object) => void;
+	onFormSubmit: (data: UserProps) => void;
 	isLoading?: boolean;
 }
 

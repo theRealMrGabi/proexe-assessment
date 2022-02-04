@@ -1,7 +1,14 @@
 import type { NextPage } from "next";
 import { useEffect, useState, useMemo } from "react";
 import { DialogOverlay, DialogContent } from "@reach/dialog";
-import { GetUsers, CreateUser } from "@redux/actions";
+import {
+	GetUsers,
+	CreateUser,
+	SetUserToEdit,
+	EditUser,
+	SetModalType,
+	ClearSelectedUser,
+} from "@redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	Button,
@@ -9,21 +16,30 @@ import {
 	UserTableHeader,
 	AddUserForm,
 	Layout,
+	LoadingSpinner,
 } from "@components";
 import { AppState } from "@redux/reducers";
 import styles from "../styles/modal.module.scss";
 
 const Home: NextPage = () => {
+	const { users, modalType, loading } = useSelector(
+		(state: AppState) => state.user
+	);
 	const [modal, setModal] = useState<boolean>(false);
 
 	const dispatch = useDispatch();
 	const getUsers = GetUsers();
 	const createUser = CreateUser();
+	const setUserToEdit = SetUserToEdit();
+	const editUser = EditUser();
+	const setModalType = SetModalType();
+	const clearSelectedUser = ClearSelectedUser();
 
 	const openModal = () => setModal(true);
-	const closeModal = () => setModal(false);
-
-	const { users } = useSelector((state: AppState) => state.user);
+	const closeModal = () => {
+		setModal(false);
+		dispatch(clearSelectedUser());
+	};
 
 	const memoisedUsers: UserProps[] = useMemo(() => users, [users]);
 
@@ -32,14 +48,11 @@ const Home: NextPage = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	// const handleFormSubmit = (data: object) => createUser(data);
-
-	// const handleFormSubmit = (data: object) => {
-	// 	// console.log("action submit--->");
-	// 	// console.log("form data -->", data);
-
-	// 	dispatch(createUser(data, () => closeModal()));
-	// };
+	const handleFormSubmit = (data: UserProps) => {
+		modalType === "Add New User"
+			? dispatch(createUser(data))
+			: dispatch(editUser(data));
+	};
 
 	return (
 		<Layout>
@@ -53,13 +66,15 @@ const Home: NextPage = () => {
 							<Button
 								bgColor="blue"
 								text="Add User"
-								onClick={() => openModal()}
+								onClick={() => {
+									openModal();
+									dispatch(setModalType("Add New User"));
+								}}
 							/>
 						</div>
 					</div>
 
 					<div className="p-4">
-						{/* {users?.length > 0 ? ( */}
 						{memoisedUsers?.length > 0 ? (
 							<Table
 								header={UserTableHeader}
@@ -69,6 +84,8 @@ const Home: NextPage = () => {
 									city: item.city,
 									edit: {
 										id: item?.id,
+										setUser: () => dispatch(setUserToEdit(item)),
+										modalType: () => dispatch(setModalType("Edit User")),
 										editAction: () => {
 											openModal();
 										},
@@ -79,9 +96,17 @@ const Home: NextPage = () => {
 								}))}
 							/>
 						) : (
-							<div className="text-center text-lg font-medium">
-								No data available
-							</div>
+							<>
+								{loading ? (
+									<div className="grid place-content-center min-h-[40vh]">
+										<LoadingSpinner />
+									</div>
+								) : !memoisedUsers.length ? (
+									<div className="grid place-content-center min-h-[40vh] text-lg font-medium">
+										No Data Available
+									</div>
+								) : null}
+							</>
 						)}
 					</div>
 				</div>
@@ -90,7 +115,7 @@ const Home: NextPage = () => {
 					<DialogContent className={styles.formModal} aria-label="modal">
 						<AddUserForm
 							closeModal={closeModal}
-							// onFormSubmit={handleFormSubmit}
+							onFormSubmit={handleFormSubmit}
 						/>
 					</DialogContent>
 				</DialogOverlay>

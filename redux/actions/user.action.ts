@@ -4,8 +4,8 @@ import { Dispatch } from "redux";
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "@redux/reducers";
 
-export const GetUsers = ()=> {
-  return (successCallback?: ()=> void, errorCallback?: ()=> void)=> (dispatch: Dispatch)=> (
+export const GetUsers = () => {
+  return (successCallback?: () => void, errorCallback?: () => void) => (dispatch: Dispatch) => (
     dispatch({type: types.GET_USERS.REQUEST}),
     axios.request(
       "GET",
@@ -20,8 +20,7 @@ export const GetUsers = ()=> {
               email: item?.email,
               city: item?.address?.city,
             }
-
-            return data
+            return data;
           })
           dispatch({type: types.GET_USERS.SUCCESS, payload: [...users] });
         }
@@ -36,25 +35,56 @@ export const GetUsers = ()=> {
 }
 
 export const CreateUser = () => {
-	const dispatch = useDispatch();
   const  {users} = useSelector((state: AppState) => state.user);
 
-  console.log('action called ->');
-  
-
-  return (data: object) => {
+  return (data: UserProps) =>(dispatch: Dispatch)=> {
     dispatch({type: types.CREATE_USER.REQUEST});
 
-    const highestId = users.reduce(
+    /** We are getting highest ID so the new user to be created will have and id of getHighestId + 1 */
+    const getHighestId = users.reduce(
       (acc: number, current: UserProps) => Math.max(acc, current.id),
       0
 	  );
 
-    //@ts-ignore
-    data.id = highestId + 1;
- 
-     dispatch({type: types.CREATE_USER.SUCCESS, payload: data});
-    // successCallback?.()
+    data.id = getHighestId + 1;
+
+    const newUser = users.push(data);
+    dispatch({type: types.CREATE_USER.SUCCESS, payload: newUser});
+  }
+}
+
+export const EditUser = () => {
+  const  {users} = useSelector((state: AppState) => state.user);
+
+  return (data: UserProps) =>(dispatch: Dispatch) => {
+    dispatch({type: types.EDIT_USER.REQUEST});
+
+    if(Array.isArray(users)){
+      /**Find index of data to be updated */
+      const selectedUserIndex = users.findIndex(item => item.id === data.id);
+
+      /**Remove and replace old data with new data */
+      const user = users.splice(selectedUserIndex, 1, data);
+      dispatch({type: types.EDIT_USER.SUCCESS, payload: user});
+    }
+  }
+}
+
+export const SetUserToEdit = () => {
+  return(data: UserProps)=> (dispatch:Dispatch)=> {
+    dispatch({type: types.SET_USER_TO_EDIT.REQUEST, payload: data});
+  }
+}
+
+export const ClearSelectedUser = () => {
+  return () => (dispatch:Dispatch)=> {
+    dispatch({type: types.CLEAR_SELECTED_USER.REQUEST, payload: {}});
+  }
+}
+
+export const SetModalType = () => {
+  return (modal: modalType) => (dispatch:Dispatch)=> {
+    dispatch({type: types.SELECT_MODAL_TYPE.REQUEST, payload: modal});
   }
 }
 

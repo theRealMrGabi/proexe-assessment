@@ -1,7 +1,6 @@
 import { FC, useMemo } from "react";
-import { LoadingSpinner } from "@components";
-import styles from "./Table.module.scss";
 import { useTable } from "react-table";
+import styles from "./Table.module.scss";
 
 interface TableProps {
 	header: {
@@ -10,16 +9,9 @@ interface TableProps {
 		component?: (item: any) => JSX.Element;
 	}[];
 	tableData?: any;
-	loading?: boolean;
-	error?: null;
 }
 
-export const Table: FC<TableProps> = ({
-	header,
-	tableData,
-	loading,
-	error,
-}) => {
+export const Table: FC<TableProps> = ({ header, tableData }) => {
 	const columns: any = useMemo(() => header, [header]);
 	const data = useMemo(() => tableData, [tableData]);
 
@@ -50,7 +42,7 @@ export const Table: FC<TableProps> = ({
 				</thead>
 
 				{Boolean(data?.length) && (
-					<tbody className="t-body bg-base-white-200" {...getTableBodyProps()}>
+					<tbody className="bg-base-white-200" {...getTableBodyProps()}>
 						{rows.map((row, i) => {
 							prepareRow(row);
 							return (
@@ -65,26 +57,6 @@ export const Table: FC<TableProps> = ({
 								</tr>
 							);
 						})}
-					</tbody>
-				)}
-
-				{!Boolean(data?.length) && (
-					<tbody className="w-full h-full">
-						<tr>
-							<td>
-								{loading ? (
-									<div className="flex justify-center items-center">
-										<LoadingSpinner />
-									</div>
-								) : (
-									<div className="text-center font-bold text-xl">
-										No Data Available
-									</div>
-								)}
-							</td>
-						</tr>
-
-						{error && <div className="items-center">{error}</div>}
 					</tbody>
 				)}
 			</table>
