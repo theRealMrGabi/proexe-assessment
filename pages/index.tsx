@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DialogOverlay, DialogContent } from "@reach/dialog";
 import {
 	GetUsers,
@@ -17,6 +17,7 @@ import {
 	AddUserForm,
 	Layout,
 	LoadingSpinner,
+	Select,
 } from "@components";
 import { AppState } from "@redux/reducers";
 import styles from "../styles/modal.module.scss";
@@ -26,6 +27,8 @@ const Home: NextPage = () => {
 		(state: AppState) => state.user
 	);
 	const [modal, setModal] = useState<boolean>(false);
+	const [localUsers, setLocalUsers] = useState<any>([]);
+	const [filterValue, setfilterValue] = useState("id");
 
 	const dispatch = useDispatch();
 	const getUsers = GetUsers();
@@ -41,12 +44,26 @@ const Home: NextPage = () => {
 		dispatch(clearSelectedUser());
 	};
 
-	const memoisedUsers: UserProps[] = useMemo(() => users, [users]);
+	const filterUsers = useCallback(() => {
+		const sort = [...localUsers].sort((a: any, b: any) =>
+			a[filterValue] > b[filterValue] ? 1 : -1
+		);
+		return setLocalUsers(sort);
+	}, [localUsers, filterValue]);
 
 	useEffect(() => {
 		dispatch(getUsers());
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	useEffect(() => {
+		setLocalUsers(users);
+	}, [users]);
+
+	useEffect(() => {
+		filterUsers();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [filterValue]);
 
 	const handleFormSubmit = (data: UserProps) => {
 		modalType === "Add New User"
@@ -60,25 +77,42 @@ const Home: NextPage = () => {
 				<h3 className="font-bold text-xl md:text-3xl">Dashboard</h3>
 
 				<div className="shadow-form rounded-md mt-6">
-					<div className="p-4 flex justify-between border-b border-gray-200 items-center">
+					<div className="p-4 flex flex-col md:flex-row justify-between border-b border-gray-200 items-start md:items-center gap-y-3 md:gap-y-0">
 						<h4 className="font-medium text-lg">User List</h4>
-						<div>
-							<Button
-								bgColor="blue"
-								text="Add User"
-								onClick={() => {
-									openModal();
-									dispatch(setModalType("Add New User"));
-								}}
-							/>
+
+						<div className="flex gap-x-4 items-center">
+							<div className="">
+								<Select
+									placeholder="Filter"
+									options={[
+										{ value: "id", label: "All" },
+										{ value: "username", label: "Username" },
+										{ value: "name", label: "Name" },
+										{ value: "email", label: "Email" },
+										{ value: "city", label: "City" },
+										{ value: "id", label: "ID" },
+									]}
+									onChange={({ value }: any) => setfilterValue(value)}
+								/>
+							</div>
+							<div>
+								<Button
+									bgColor="blue"
+									text="Add User"
+									onClick={() => {
+										openModal();
+										dispatch(setModalType("Add New User"));
+									}}
+								/>
+							</div>
 						</div>
 					</div>
 
 					<div className="p-4">
-						{memoisedUsers?.length > 0 ? (
+						{localUsers?.length > 0 ? (
 							<Table
 								header={UserTableHeader}
-								tableData={[...users]?.map((item: UserProps, i) => ({
+								tableData={localUsers?.map((item: UserProps, i: number) => ({
 									...item,
 									sn: i + 1,
 									city: item.city,
@@ -101,7 +135,7 @@ const Home: NextPage = () => {
 									<div className="grid place-content-center min-h-[40vh]">
 										<LoadingSpinner />
 									</div>
-								) : !memoisedUsers.length ? (
+								) : !localUsers.length ? (
 									<div className="grid place-content-center min-h-[40vh] text-lg font-medium">
 										No Data Available
 									</div>

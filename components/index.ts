@@ -5,3 +5,4 @@ export * from "./layout";
 export * from "./user/index";
 export * from "./LoadingSpinner";
 export * from "./table/Table";
+export * from "./Select";
