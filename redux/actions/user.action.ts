@@ -1,13 +1,13 @@
 import * as types from "../types";
-import axios from "services/axios";
 import { Dispatch } from "redux";
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "@redux/reducers";
+import { apiservice } from "@services";
 
 export const GetUsers = () => {
   return (successCallback?: () => void, errorCallback?: () => void) => (dispatch: Dispatch) => (
     dispatch({type: types.GET_USERS.REQUEST}),
-    axios.request(
+    apiservice.request(
       "GET",
       'data',
       (res: unknown)=> {

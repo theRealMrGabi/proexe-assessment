@@ -4,7 +4,7 @@ import axios, {
 	AxiosResponse,
 	AxiosInstance,
 } from "axios";
-import { showToast } from "utils";
+import { showToast } from "@utils";
 
 let that: any;
 
@@ -106,4 +106,5 @@ class ApiService {
 	}
 }
 
-export default new ApiService();
+// export default new ApiService();
+export const apiservice = new ApiService();

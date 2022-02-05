@@ -3,7 +3,7 @@ import Head from "next/head";
 
 export const Meta: FC<MetaProps> = ({ title, keywords, description }) => {
 	const name = "Proexe assessment";
-	const websiteURL = "https://proexeassessment.io";
+	const websiteURL = "https://proexe-assessment.netlify.app/";
 	const metaContent = "";
 
 	return (

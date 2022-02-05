@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { Meta, ErrorUI } from "components";
+import { Meta, ErrorUI } from "@components";
 
 export const Layout: FC<MetaProps> = ({
 	children,
